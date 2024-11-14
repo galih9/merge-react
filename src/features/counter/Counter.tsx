@@ -10,11 +10,15 @@ import {
   incrementIfOdd,
   selectCount,
   selectStatus,
+  setSaved,
 } from "./counterSlice"
+import { useSelector } from "react-redux"
+import { RootState } from "../../app/store"
 
 export const Counter = () => {
   const dispatch = useAppDispatch()
   const count = useAppSelector(selectCount)
+  const { saved } = useSelector((state: RootState) => state.counter)
   const status = useAppSelector(selectStatus)
   const [incrementAmount, setIncrementAmount] = useState("2")
 
@@ -23,6 +27,9 @@ export const Counter = () => {
   return (
     <div>
       <div className={styles.row}>
+        <span aria-label="Count" className={styles.value}>
+          {saved}
+        </span>
         <button
           className={styles.button}
           aria-label="Decrement value"
@@ -71,6 +78,14 @@ export const Counter = () => {
           }}
         >
           Add If Odd
+        </button>
+        <button
+          className={styles.button}
+          onClick={() => {
+            dispatch(setSaved("ayyyy"))
+          }}
+        >
+          Test
         </button>
       </div>
     </div>
