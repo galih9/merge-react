@@ -8,6 +8,7 @@ const App = () => {
     <div className="App">
       <DndProvider backend={HTML5Backend}>
         <GamePage />
+        <div>Made with anger by 45aken</div>
       </DndProvider>
     </div>
   )

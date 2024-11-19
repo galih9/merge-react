@@ -1,20 +1,24 @@
 export interface IItemTypes {
   code: string
   title: string
+  charges?: number
 }
 
 export const list_item: IItemTypes[] = [
   {
     code: "BAG1",
     title: "Bag 1",
+    charges: 5,
   },
   {
     code: "BAG2",
     title: "Bag 2",
+    charges: 10,
   },
   {
     code: "BAG3",
     title: "Bag 3",
+    charges: 20,
   },
   {
     code: "A1",
@@ -65,3 +69,34 @@ export const list_item: IItemTypes[] = [
 export const COL_CHOCOLATE = "#de6800"
 export const COL_BRIGHT_CHOCOLATE = "#f5ae70"
 export const COL_LESS_BRIGHT_CHOCOLATE = "#b38052"
+
+export type Box = {
+  isFilled: boolean
+  name: string
+  index: number
+  itemTypes?: IItemTypes
+  charges?: number | null | undefined
+  condition: "locked" | "normal"
+}
+
+export interface ICompleteQuestProps {
+  questIdx: number
+}
+
+export interface IQuest {
+  title: string
+  required_item: number
+  current_progress: number
+  reward: IItemTypes
+  required_type: string
+}
+
+export interface IInitialProps {
+  data: Box[]
+  quests: IQuest[]
+}
+
+export interface IReplaceProps {
+  indexFr: number
+  indexTo: number
+}

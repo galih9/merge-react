@@ -9,6 +9,7 @@ interface BoxProps {
   index: number
   type: string
   boxId: string
+  condition: "normal" | "locked"
 }
 
 interface DragItem {
@@ -16,7 +17,7 @@ interface DragItem {
   index: number
   type: string
 }
-export const Box: FC<BoxProps> = ({ name, index, type, boxId }) => {
+export const Box: FC<BoxProps> = ({ name, index, type, boxId, condition }) => {
   const dispatch = useDispatch()
 
   // DRAG
@@ -28,7 +29,6 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId }) => {
         const dropResult = monitor.getDropResult<DragItem>()
         if (item && dropResult) {
           console.log(type, index, dropResult.type, dropResult.index)
-          // alert(`You dropped ${item.name} into ${dropResult.name}!`)
           if (index != dropResult.index) {
             if (type === dropResult.type) {
               dispatch(
@@ -55,12 +55,12 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId }) => {
     [name],
   )
   // DROP
-  const [, drop] = useDrop(() => ({
+  const [{ isOver }, drop] = useDrop(() => ({
     accept: "obj",
     drop: () => ({ name: name, index: index, type: type }),
     collect: monitor => ({
       isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
+      canDrop: condition === "normal" ? monitor.canDrop() : false,
     }),
   }))
 
@@ -69,19 +69,23 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId }) => {
     drop(el)
   }
   return (
-    <div className={boxId}>
-      <div className="h-[50px] w-[50px] bg-yellow-300 flex flex-row justify-center items-center">
+    <div className={"bg-emerald-600"}>
+      <div className={boxId}>
         <div
-          onClick={() => {
-            if (type === list_item[0].code) {
-              dispatch(addData({ parentIndex: index }))
-            }
-          }}
-          ref={attachRef}
-          className={`h-[45px] w-[45px] bg-white font-extrabold flex flex-row justify-center items-center border border-solid border-slate-950`}
+          className={`h-[50px] w-[50px] ${isOver ? "opacity-20" : "opacity-100"} bg-yellow-300 flex flex-row justify-center items-center`}
         >
-          {/* <ItemImageDisplayer src={calculateImageId(type)} /> */}
-          {!type.includes("BAG") ? type[1] : type}
+          <div
+            onClick={() => {
+              if (type === list_item[0].code) {
+                dispatch(addData({ parentIndex: index }))
+              }
+            }}
+            ref={attachRef}
+            className={`h-[45px] w-[45px] ${condition === "normal" ? "bg-white" : "bg-gray-400"} font-extrabold flex flex-row justify-center items-center border border-solid border-slate-950`}
+          >
+            {/* <ItemImageDisplayer src={calculateImageId(type)} /> */}
+            {!type.includes("BAG") ? type[1] : type}
+          </div>
         </div>
       </div>
     </div>
