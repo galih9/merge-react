@@ -5,11 +5,12 @@ interface IProps {
   name: string
   index: number
   boxId: string
+  type?: string
 }
-export const EmptyBox: FC<IProps> = ({ name, index, boxId }) => {
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+export const EmptyBox: FC<IProps> = ({ name, index, boxId,type }) => {
+  const [{ canDrop }, drop] = useDrop(() => ({
     accept: "obj",
-    drop: () => ({ name: name, index: index }),
+    drop: () => ({ name: name, index: index, type: type }),
     collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -20,7 +21,7 @@ export const EmptyBox: FC<IProps> = ({ name, index, boxId }) => {
     <>
       <div
         ref={drop}
-        className={`${boxId} h-[100px] w-[100px] ${canDrop ? "bg-lime-300" : "bg-slate-300"} `}
+        className={`${boxId} h-[50px] w-[50px] ${canDrop ? "bg-lime-300" : "bg-slate-300"} `}
       ></div>
     </>
   )

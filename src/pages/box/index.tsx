@@ -1,24 +1,8 @@
-import { useEffect, useState, type CSSProperties, type FC } from "react"
+import { FC } from "react"
 import { ConnectableElement, useDrag, useDrop } from "react-dnd"
-
-import { ItemTypes } from "../types"
 import { useDispatch } from "react-redux"
-import { replaceData } from "../slice"
-import {
-  calculateImageId,
-  ItemImageDisplayer,
-} from "../../utils/image-calculator"
-import anime from "animejs"
-
-const style: CSSProperties = {
-  border: "1px dashed gray",
-  backgroundColor: "white",
-  padding: "0.5rem 1rem",
-  marginRight: "1.5rem",
-  marginBottom: "1.5rem",
-  cursor: "move",
-  float: "left",
-}
+import { addData, mergeData, replaceData } from "../slice"
+import { list_item } from "../types"
 
 interface BoxProps {
   name: string
@@ -30,28 +14,38 @@ interface BoxProps {
 interface DragItem {
   name: string
   index: number
+  type: string
 }
 export const Box: FC<BoxProps> = ({ name, index, type, boxId }) => {
   const dispatch = useDispatch()
-  const el = document.querySelector(".box-1")?.getBoundingClientRect()
 
   // DRAG
-  const [{ isDragging }, drag] = useDrag(
+  const [, drag] = useDrag(
     () => ({
       type: "obj",
       item: { name, index },
       end: (item, monitor) => {
         const dropResult = monitor.getDropResult<DragItem>()
-        console.log(dropResult)
         if (item && dropResult) {
+          console.log(type, index, dropResult.type, dropResult.index)
           // alert(`You dropped ${item.name} into ${dropResult.name}!`)
-          console.log(dropResult)
-          dispatch(
-            replaceData({
-              indexFr: item.index,
-              indexTo: dropResult.index,
-            }),
-          )
+          if (index != dropResult.index) {
+            if (type === dropResult.type) {
+              dispatch(
+                mergeData({
+                  indexFr: item.index,
+                  indexTo: dropResult.index,
+                }),
+              )
+            } else {
+              dispatch(
+                replaceData({
+                  indexFr: item.index,
+                  indexTo: dropResult.index,
+                }),
+              )
+            }
+          }
         }
       },
       collect: monitor => ({
@@ -60,11 +54,10 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId }) => {
     }),
     [name],
   )
-  const opacity = isDragging ? 0.4 : 1
   // DROP
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+  const [, drop] = useDrop(() => ({
     accept: "obj",
-    drop: () => ({ name: name, index: index }),
+    drop: () => ({ name: name, index: index, type: type }),
     collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -77,24 +70,15 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId }) => {
   }
   return (
     <div className={boxId}>
-      <div className="h-[100px] w-[100px] bg-yellow-300 flex flex-row justify-center items-center">
+      <div className="h-[50px] w-[50px] bg-yellow-300 flex flex-row justify-center items-center">
         <div
           onClick={() => {
-            // console.log(document.querySelector(".box-1")?.getBoundingClientRect())
-            // console.log(boxId, el)
-            // anime({
-            //   targets: boxId,
-            //   easing: "easeInOutExpo",
-            //   loop: true,
-            //   top: el?.top,
-            //   left: el?.left,
-            // })
-            if (type === ItemTypes.BOX1) {
-              
+            if (type === list_item[0].code) {
+              dispatch(addData({ parentIndex: index }))
             }
           }}
           ref={attachRef}
-          className={`h-[50px] w-[50px] bg-white font-extrabold flex flex-row justify-center items-center border border-solid border-slate-950`}
+          className={`h-[45px] w-[45px] bg-white font-extrabold flex flex-row justify-center items-center border border-solid border-slate-950`}
         >
           {/* <ItemImageDisplayer src={calculateImageId(type)} /> */}
           {!type.includes("BAG") ? type[1] : type}
