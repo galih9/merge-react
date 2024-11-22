@@ -8,17 +8,17 @@ export const list_item: IItemTypes[] = [
   {
     code: "BAG1",
     title: "Bag 1",
-    charges: 5,
+    charges: 10,
   },
   {
     code: "BAG2",
     title: "Bag 2",
-    charges: 10,
+    charges: 15,
   },
   {
     code: "BAG3",
     title: "Bag 3",
-    charges: 20,
+    charges: 30,
   },
   {
     code: "A1",
@@ -57,7 +57,7 @@ export const list_item: IItemTypes[] = [
     title: "A9",
   },
   {
-    code: "A110",
+    code: "A10",
     title: "A10",
   },
   {

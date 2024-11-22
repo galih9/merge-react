@@ -2,7 +2,6 @@ import { FC, memo } from "react"
 import { Box as Boxes } from "./box"
 import { RootState } from "../app/store"
 import { useDispatch, useSelector } from "react-redux"
-import { EmptyBox } from "./box/empty"
 import { completeQuest, getSpecificItemCount } from "./slice"
 interface ViewProps {}
 
@@ -16,7 +15,7 @@ const View: FC<ViewProps> = () => {
           <div className="border border-red-600 h-full w-60">
             <p>Quests</p>
             {quests.map((e, i) => (
-              <div className="border border-slate-800 py-4">
+              <div key={i} className="border border-slate-800 py-4">
                 <div>
                   <p>{e.title}</p>
                   <p>
@@ -42,24 +41,16 @@ const View: FC<ViewProps> = () => {
             ))}
           </div>
           <div className="col-span-9 grid grid-cols-9 gap-4">
-            {data.map((e, i) =>
-              e.isFilled ? (
-                <Boxes
-                  name={`${i + 1}`}
-                  index={i}
-                  type={e.itemTypes?.code ?? ""}
-                  boxId={`box-` + i}
-                  condition={e.condition}
-                />
-              ) : (
-                <EmptyBox
-                  name={`${i + 1}`}
-                  index={i}
-                  boxId={`box-` + i}
-                  type={e.itemTypes?.code}
-                />
-              ),
-            )}
+            {data.map((e, i) => (
+              <Boxes
+                isFilled={e.isFilled}
+                key={i}
+                name={`${i + 1}`}
+                index={i}
+                type={e.itemTypes?.code ?? ""}
+                boxId={`box-` + i}
+              />
+            ))}
           </div>
         </div>
       </div>

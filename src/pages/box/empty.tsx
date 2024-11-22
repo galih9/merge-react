@@ -21,7 +21,8 @@ export const EmptyBox: FC<IProps> = ({ name, index, boxId,type }) => {
     <>
       <div
         ref={drop}
-        className={`${boxId} h-[50px] w-[50px] ${canDrop ? "bg-lime-300" : "bg-slate-300"} `}
+        id={boxId}
+        className={`h-[50px] w-[50px] ${canDrop ? "bg-lime-300" : "bg-slate-300"} `}
       ></div>
     </>
   )

@@ -1,34 +1,33 @@
 import { FC } from "react"
 import { ConnectableElement, useDrag, useDrop } from "react-dnd"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { addData, mergeData, replaceData } from "../slice"
 import { list_item } from "../types"
+import { RootState } from "../../app/store"
+import { motion } from "framer-motion"
+import { calculateRandomNumber } from "../../utils/coordinates"
 
 interface BoxProps {
   name: string
   index: number
-  type: string
+  type?: string
   boxId: string
-  condition: "normal" | "locked"
+  isFilled: boolean
 }
 
-interface DragItem {
-  name: string
-  index: number
-  type: string
-}
-export const Box: FC<BoxProps> = ({ name, index, type, boxId, condition }) => {
+export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
   const dispatch = useDispatch()
+  const { data } = useSelector((state: RootState) => state.gameSlice)
 
   // DRAG
-  const [, drag] = useDrag(
+  const [{ isDragging }, drag] = useDrag(
     () => ({
       type: "obj",
-      item: { name, index },
+      item: { name: name, index: index, type: type },
       end: (item, monitor) => {
-        const dropResult = monitor.getDropResult<DragItem>()
+        const dropResult = monitor.getDropResult<BoxProps>()
+        console.log("result", dropResult)
         if (item && dropResult) {
-          console.log(type, index, dropResult.type, dropResult.index)
           if (index != dropResult.index) {
             if (type === dropResult.type) {
               dispatch(
@@ -48,19 +47,23 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, condition }) => {
           }
         }
       },
+      canDrag: data[index].condition != "locked",
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [name],
+    [name, type, index],
   )
+
   // DROP
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: "obj",
+    item: { name, index, type },
     drop: () => ({ name: name, index: index, type: type }),
     collect: monitor => ({
       isOver: monitor.isOver(),
-      canDrop: condition === "normal" ? monitor.canDrop() : false,
+      canDrop: data[index].condition === "normal" ? monitor.canDrop() : false,
+      // canDrop: monitor.canDrop(),
     }),
   }))
 
@@ -69,10 +72,23 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, condition }) => {
     drop(el)
   }
   return (
-    <div className={"bg-emerald-600"}>
-      <div className={boxId}>
-        <div
-          className={`h-[50px] w-[50px] ${isOver ? "opacity-20" : "opacity-100"} bg-yellow-300 flex flex-row justify-center items-center`}
+    <div className={"bg-emerald-600 cursor-grab"}>
+      <div id={boxId} className={`${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}>
+        <motion.div
+          whileHover={
+            data[index].condition != "locked" ? { scale: 1.2 } : undefined
+          }
+          whileTap={
+            data[index].condition != "locked" ? { scale: 0.8 } : undefined
+          }
+          initial={{
+            y: calculateRandomNumber(300, 100),
+            x: calculateRandomNumber(300, 100),
+            opacity: 0,
+            scale: 0.8,
+          }}
+          animate={{ y: 0, x: 0, opacity: 1, scale: 1 }}
+          className={`${!isDragging ? "visible" : "hidden"} h-[50px] w-[50px] ${isOver ? "opacity-20" : "opacity-100"} ${isFilled ? "bg-yellow-300" : canDrop ? "bg-lime-300" : "bg-slate-300"} flex flex-row justify-center items-center`}
         >
           <div
             onClick={() => {
@@ -81,12 +97,12 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, condition }) => {
               }
             }}
             ref={attachRef}
-            className={`h-[45px] w-[45px] ${condition === "normal" ? "bg-white" : "bg-gray-400"} font-extrabold flex flex-row justify-center items-center border border-solid border-slate-950`}
+            className={` ${isFilled ? "opacity-100" : "opacity-0"} h-[45px] w-[45px] ${data[index].condition === "normal" ? "bg-white" : "bg-gray-400"} font-extrabold flex flex-row justify-center items-center border border-solid border-slate-950`}
           >
             {/* <ItemImageDisplayer src={calculateImageId(type)} /> */}
-            {!type.includes("BAG") ? type[1] : type}
+            {type ?? ""}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

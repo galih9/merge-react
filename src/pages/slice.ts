@@ -38,7 +38,7 @@ const initialState: IInitialProps = {
   ],
 }
 
-const checkAvailableSlot = (state: Box[]): number | null => {
+export const checkAvailableSlot = (state: Box[]): number | null => {
   for (let i = 0; i < state.length; i++) {
     const element = state[i]
     if (!element.isFilled) {
@@ -110,7 +110,11 @@ const gameSlice = createSlice({
         table[tdx] = fr
         table[fdx] = to
       } else {
-        table[tdx] = { ...to, itemTypes: next_tier }
+        table[tdx] = {
+          ...to,
+          itemTypes: next_tier,
+          condition: to.condition === "locked" ? "normal" : to.condition,
+        }
         table[fdx] = {
           ...fr,
           isFilled: false,
