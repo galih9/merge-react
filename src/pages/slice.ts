@@ -5,21 +5,114 @@ import {
   IInitialProps,
   IItemTypes,
   IReplaceProps,
+  list_bag,
   list_item,
 } from "./types"
 
-const SOURCE_DATA: Box[] = Array.from(new Array(45)).map((_, index) => ({
-  isFilled: index === 20 || index === 30,
-  index,
-  name: index.toString(),
-  charges: index === 20 ? 10 : undefined,
-  itemTypes:
-    index === 20 ? list_item[0] : index === 30 ? list_item[4] : undefined,
-  condition: index === 30 ? "locked" : "normal",
-}))
+const populateData = (): Box[] => {
+  var result: Box[] = Array.from(new Array(45)).map((_, index) => ({
+    isFilled: false,
+    index,
+    name: index.toString(),
+    charges: undefined,
+    itemTypes: undefined,
+    condition: "locked",
+  }))
+
+  const { outerEdge, innerEdge } = getGridEdges(result, 5, 9); // 5 rows, 9 columns
+
+  for (let i = 0; i < outerEdge.length; i++) {
+    const element = outerEdge[i]
+    result[element] = {
+      ...result[element],
+      isFilled: true,
+      itemTypes: list_item[7],
+      condition: "locked",
+    }
+  }
+
+  for (let i = 0; i < innerEdge.length; i++) {
+    const element = innerEdge[i]
+    result[element] = {
+      ...result[element],
+      isFilled: true,
+      itemTypes: list_item[4],
+      condition: "locked",
+    }
+  }
+
+  // // bag level 1
+  result[20] = {
+    ...result[20],
+    isFilled: true,
+    charges: 10,
+    itemTypes: list_bag[0],
+    condition: "normal",
+  }
+
+  result[23] = {
+    ...result[23],
+    isFilled: true,
+    itemTypes: list_item[1],
+    condition: "locked",
+  }
+
+  result[24] = {
+    ...result[24],
+    isFilled: true,
+    itemTypes: list_item[2],
+    condition: "locked",
+  }
+
+  result[25] = {
+    ...result[25],
+    isFilled: true,
+    itemTypes: list_item[3],
+    condition: "locked",
+  }
+
+  return result
+}
+function getGridEdges(grid: Box[], rows: number, cols: number) {
+  const outerEdge: number[] = [];
+  const innerEdge: number[] = [];
+
+  for (let i = 0; i < grid.length; i++) {
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+
+    // Outer edge: first/last row OR first/last column
+    if (
+      row === 0 || // Top row
+      row === rows - 1 || // Bottom row
+      col === 0 || // First column
+      col === cols - 1 // Last column
+    ) {
+      outerEdge.push(i);
+    }
+    // Inner edge: second/second-to-last row/column excluding the true outer edge
+    else if (
+      (row === 1 || row === rows - 2) || // Second/second-to-last rows
+      (col === 1 || col === cols - 2) // Second/second-to-last columns
+    ) {
+      // Include only valid inner edge cells
+      if (
+        (row === 1 && col >= 1 && col <= cols - 2) || // Top inner edge
+        (row === rows - 2 && col >= 1 && col <= cols - 2) || // Bottom inner edge
+        (col === 1 && row > 1 && row < rows - 2) || // Left inner edge
+        (col === cols - 2 && row > 1 && row < rows - 2) // Right inner edge
+      ) {
+        innerEdge.push(i);
+      }
+    }
+  }
+
+  return { outerEdge, innerEdge };
+}
+
 
 const initialState: IInitialProps = {
-  data: SOURCE_DATA,
+  data: populateData(),
   quests: [
     {
       title: "3 level 2 items",
@@ -92,7 +185,7 @@ const gameSlice = createSlice({
           isFilled: true,
           name: `${idx + 1}`,
           index: idx,
-          itemTypes: list_item[3],
+          itemTypes: list_item[0],
           condition: "normal",
         }
         state.data[idx] = newdata
@@ -125,6 +218,7 @@ const gameSlice = createSlice({
       state.data = table
     },
     replaceData: (state, action: PayloadAction<IReplaceProps>) => {
+      console.log("replace called",action.payload.indexFr,action.payload.indexTo)
       const fr = state.data[action.payload.indexFr]
       const to = state.data[action.payload.indexTo]
       state.data[action.payload.indexTo] = fr

@@ -4,7 +4,7 @@ export interface IItemTypes {
   charges?: number
 }
 
-export const list_item: IItemTypes[] = [
+export const list_bag: IItemTypes[] = [
   {
     code: "BAG1",
     title: "Bag 1",
@@ -20,6 +20,14 @@ export const list_item: IItemTypes[] = [
     title: "Bag 3",
     charges: 30,
   },
+  {
+    code: "BAG4",
+    title: "Bag 4",
+    charges: 30,
+  },
+]
+
+export const list_item: IItemTypes[] = [
   {
     code: "A1",
     title: "A1",
@@ -63,6 +71,30 @@ export const list_item: IItemTypes[] = [
   {
     code: "A11",
     title: "A11",
+  },
+  {
+    code: "A12",
+    title: "A12",
+  },
+  {
+    code: "A13",
+    title: "A13",
+  },
+  {
+    code: "A14",
+    title: "A14",
+  },
+  {
+    code: "A15",
+    title: "A15",
+  },
+  {
+    code: "A16",
+    title: "A16",
+  },
+  {
+    code: "A17",
+    title: "A17",
   },
 ]
 

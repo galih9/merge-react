@@ -2,7 +2,6 @@ import { FC } from "react"
 import { ConnectableElement, useDrag, useDrop } from "react-dnd"
 import { useDispatch, useSelector } from "react-redux"
 import { addData, mergeData, replaceData } from "../slice"
-import { list_item } from "../types"
 import { RootState } from "../../app/store"
 import { motion } from "framer-motion"
 import { calculateRandomNumber } from "../../utils/coordinates"
@@ -26,8 +25,15 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
       item: { name: name, index: index, type: type },
       end: (item, monitor) => {
         const dropResult = monitor.getDropResult<BoxProps>()
-        console.log("result", dropResult)
         if (item && dropResult) {
+          // const toItem = data[dropResult.index]
+          // console.log(
+          //   "result",
+          //   dropResult.index,
+          //   "/compare/",
+          //   toItem.index,
+          //   index,
+          // )
           if (index != dropResult.index) {
             if (type === dropResult.type) {
               dispatch(
@@ -52,20 +58,23 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
         isDragging: monitor.isDragging(),
       }),
     }),
-    [name, type, index],
+    [name, type, index, data],
   )
 
   // DROP
-  const [{ isOver, canDrop }, drop] = useDrop(() => ({
-    accept: "obj",
-    item: { name, index, type },
-    drop: () => ({ name: name, index: index, type: type }),
-    collect: monitor => ({
-      isOver: monitor.isOver(),
-      canDrop: data[index].condition === "normal" ? monitor.canDrop() : false,
-      // canDrop: monitor.canDrop(),
+  const [{ isOver, canDrop }, drop] = useDrop(
+    () => ({
+      accept: "obj",
+      item: { name, index, type },
+      drop: () => ({ name: name, index: index, type: type }),
+      collect: monitor => ({
+        isOver: monitor.isOver(),
+        canDrop: data[index].condition === "normal" ? monitor.canDrop() : false,
+        // canDrop: monitor.canDrop(),
+      }),
     }),
-  }))
+    [name, type, index, data],
+  )
 
   function attachRef(el: ConnectableElement) {
     drag(el)
@@ -73,7 +82,10 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
   }
   return (
     <div className={"bg-emerald-600 cursor-grab"}>
-      <div id={boxId} className={`${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}>
+      <div
+        id={boxId}
+        className={`${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}
+      >
         <motion.div
           whileHover={
             data[index].condition != "locked" ? { scale: 1.2 } : undefined
@@ -92,7 +104,7 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
         >
           <div
             onClick={() => {
-              if (type === list_item[0].code) {
+              if (data[index].charges) {
                 dispatch(addData({ parentIndex: index }))
               }
             }}
