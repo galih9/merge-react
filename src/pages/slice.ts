@@ -19,7 +19,7 @@ const populateData = (): Box[] => {
     condition: "locked",
   }))
 
-  const { outerEdge, innerEdge } = getGridEdges(result, 5, 9); // 5 rows, 9 columns
+  const { outerEdge, innerEdge } = getGridEdges(result, 5, 9) // 5 rows, 9 columns
 
   for (let i = 0; i < outerEdge.length; i++) {
     const element = outerEdge[i]
@@ -74,12 +74,12 @@ const populateData = (): Box[] => {
   return result
 }
 function getGridEdges(grid: Box[], rows: number, cols: number) {
-  const outerEdge: number[] = [];
-  const innerEdge: number[] = [];
+  const outerEdge: number[] = []
+  const innerEdge: number[] = []
 
   for (let i = 0; i < grid.length; i++) {
-    const row = Math.floor(i / cols);
-    const col = i % cols;
+    const row = Math.floor(i / cols)
+    const col = i % cols
 
     // Outer edge: first/last row OR first/last column
     if (
@@ -88,12 +88,14 @@ function getGridEdges(grid: Box[], rows: number, cols: number) {
       col === 0 || // First column
       col === cols - 1 // Last column
     ) {
-      outerEdge.push(i);
+      outerEdge.push(i)
     }
     // Inner edge: second/second-to-last row/column excluding the true outer edge
     else if (
-      (row === 1 || row === rows - 2) || // Second/second-to-last rows
-      (col === 1 || col === cols - 2) // Second/second-to-last columns
+      row === 1 ||
+      row === rows - 2 || // Second/second-to-last rows
+      col === 1 ||
+      col === cols - 2 // Second/second-to-last columns
     ) {
       // Include only valid inner edge cells
       if (
@@ -102,14 +104,13 @@ function getGridEdges(grid: Box[], rows: number, cols: number) {
         (col === 1 && row > 1 && row < rows - 2) || // Left inner edge
         (col === cols - 2 && row > 1 && row < rows - 2) // Right inner edge
       ) {
-        innerEdge.push(i);
+        innerEdge.push(i)
       }
     }
   }
 
-  return { outerEdge, innerEdge };
+  return { outerEdge, innerEdge }
 }
-
 
 const initialState: IInitialProps = {
   data: populateData(),
@@ -119,14 +120,14 @@ const initialState: IInitialProps = {
       required_item: 3,
       required_type: "A2",
       current_progress: 0,
-      reward: list_item[0],
+      reward: list_bag[0],
     },
     {
       title: "1 level 5 items",
       required_item: 1,
       required_type: "A5",
       current_progress: 0,
-      reward: list_item[0],
+      reward: list_item[7],
     },
   ],
 }
@@ -142,10 +143,20 @@ export const checkAvailableSlot = (state: Box[]): number | null => {
 }
 
 const calculateNextTier = (val: string | undefined): IItemTypes | undefined => {
-  for (let i = 0; i < list_item.length; i++) {
-    const element = list_item[i]
-    if (val === element.code && i != list_item.length) {
-      return list_item[i + 1]
+  if (val) {
+    if (val.includes("BAG")) {
+      for (let i = 0; i < list_bag.length; i++) {
+        const element = list_bag[i]
+        if (val === element.code && i != list_bag.length) {
+          return list_bag[i + 1]
+        }
+      }
+    }
+    for (let i = 0; i < list_item.length; i++) {
+      const element = list_item[i]
+      if (val === element.code && i != list_item.length) {
+        return list_item[i + 1]
+      }
     }
   }
   return undefined
@@ -206,6 +217,7 @@ const gameSlice = createSlice({
         table[tdx] = {
           ...to,
           itemTypes: next_tier,
+          charges: next_tier.charges,
           condition: to.condition === "locked" ? "normal" : to.condition,
         }
         table[fdx] = {
@@ -218,7 +230,11 @@ const gameSlice = createSlice({
       state.data = table
     },
     replaceData: (state, action: PayloadAction<IReplaceProps>) => {
-      console.log("replace called",action.payload.indexFr,action.payload.indexTo)
+      console.log(
+        "replace called",
+        action.payload.indexFr,
+        action.payload.indexTo,
+      )
       const fr = state.data[action.payload.indexFr]
       const to = state.data[action.payload.indexTo]
       state.data[action.payload.indexTo] = fr
