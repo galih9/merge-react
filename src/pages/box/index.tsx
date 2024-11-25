@@ -42,7 +42,7 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
                   indexTo: dropResult.index,
                 }),
               )
-            } else {
+            } else if (data[dropResult.index].condition != "locked") {
               dispatch(
                 replaceData({
                   indexFr: item.index,

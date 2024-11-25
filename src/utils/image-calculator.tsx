@@ -20,7 +20,7 @@ interface IProps {
   src: string | undefined | null
 }
 export const ItemImageDisplayer: FC<IProps> = ({ src }) => {
-  return src === null ? <></> : <img src={src} />
+  return src === null ? <></> : <img src={src} className="h-10" />
 }
 
 export const calculateImageId = (id: string | null | undefined) => {
@@ -29,6 +29,9 @@ export const calculateImageId = (id: string | null | undefined) => {
   }
   let result = ""
   switch (id) {
+    case "BAG1":
+      result = BAG
+      break
     case "A1":
       result = A1
       break
@@ -75,7 +78,7 @@ export const calculateImageId = (id: string | null | undefined) => {
       result = F2
       break
     default:
-      result = BAG
+      result = ""
       break
   }
   return result

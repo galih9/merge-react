@@ -13,10 +13,8 @@ const View: FC<ViewProps> = () => {
   const targetRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
-    console.log(targetRef.current, "test")
     if (targetRef.current) {
       const rect = targetRef.current.getBoundingClientRect()
-      console.log("check =>", rect)
       setHighlightStyle({
         top: rect.top,
         left: rect.left,
@@ -31,13 +29,23 @@ const View: FC<ViewProps> = () => {
       {showTutorial && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 z-50"
-          onClick={() => setShowTutorial(false)}
+          onClick={() => {
+            // setShowTutorial(false)
+          }}
         >
           {/* Empty div for the hole */}
-          <div
-            className="absolute pointer-events-auto"
-            style={highlightStyle}
-          ></div>
+          <div className="absolute pointer-events-auto" style={highlightStyle}>
+            <button
+              ref={targetRef}
+              onClick={() => setShowTutorial(!showTutorial)}
+              className={`rounded-lg text-sm w-32 h-8 bg-[#0464ff] text-[#ffffff] justify-center`}
+            >
+              TEST
+            </button>
+            <div className="ml-[200px]">
+              <p className="text-white">{"TESSSSSS"}</p>
+            </div>
+          </div>
         </div>
       )}
 

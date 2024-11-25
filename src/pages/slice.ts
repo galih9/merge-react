@@ -208,7 +208,6 @@ const gameSlice = createSlice({
       const tdx = action.payload.indexTo
       const fr = table[fdx]
       const to = table[tdx]
-      console.log(fr.itemTypes?.code, "=", to.itemTypes?.code)
       const next_tier = calculateNextTier(fr.itemTypes?.code)
       if (fr.itemTypes?.code != to.itemTypes?.code || next_tier === undefined) {
         table[tdx] = fr
@@ -230,11 +229,6 @@ const gameSlice = createSlice({
       state.data = table
     },
     replaceData: (state, action: PayloadAction<IReplaceProps>) => {
-      console.log(
-        "replace called",
-        action.payload.indexFr,
-        action.payload.indexTo,
-      )
       const fr = state.data[action.payload.indexFr]
       const to = state.data[action.payload.indexTo]
       state.data[action.payload.indexTo] = fr
