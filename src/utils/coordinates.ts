@@ -15,8 +15,20 @@ export const calculateCoordinate = (elementId: string): IProps | undefined => {
   }
 }
 
-export const calculateRandomNumber = (maxV?: number, minV?: number): number => {
+export const calculateRandomNumber = (
+  maxV?: number,
+  minV?: number,
+  toRound?: boolean,
+): number => {
   const max = maxV ?? 100
   const min = minV ?? 30
-  return Math.random() * (max - min) + min
+  const result = Math.random() * (max - min) + min
+  if (toRound) {
+    return Math.round(result)
+  }
+  return result
+}
+
+export function removeItemFromArray<T>(array: T[], itemToRemove: T): T[] {
+  return array.filter((item) => item !== itemToRemove);
 }

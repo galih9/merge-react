@@ -3,100 +3,61 @@ export interface IItemTypes {
   title: string
   charges?: number
 }
+const createItems = (
+  prefix: string,
+  count: number,
+  charges?: number,
+): IItemTypes[] => {
+  return Array.from({ length: count }, (_, index) => ({
+    code: `${prefix}${index + 1}`,
+    title: `${prefix}${index + 1}`,
+    ...(charges !== undefined && { charges }),
+  }))
+}
 
+// Define the lists using the utility function
 export const list_bag: IItemTypes[] = [
-  {
-    code: "BAG1",
-    title: "Bag 1",
-    charges: 10,
-  },
-  {
-    code: "BAG2",
-    title: "Bag 2",
-    charges: 15,
-  },
-  {
-    code: "BAG3",
-    title: "Bag 3",
-    charges: 30,
-  },
-  {
-    code: "BAG4",
-    title: "Bag 4",
-    charges: 30,
-  },
+  ...createItems("BAG", 1, 10),
+  ...createItems("BAG", 1, 15),
+  ...createItems("BAG", 2, 30), // Includes BAG3 and BAG4
 ]
 
-export const list_item: IItemTypes[] = [
-  {
-    code: "A1",
-    title: "A1",
-  },
-  {
-    code: "A2",
-    title: "A2",
-  },
-  {
-    code: "A3",
-    title: "A3",
-  },
-  {
-    code: "A4",
-    title: "A4",
-  },
-  {
-    code: "A5",
-    title: "A5",
-  },
-  {
-    code: "A6",
-    title: "A6",
-  },
-  {
-    code: "A7",
-    title: "A7",
-  },
-  {
-    code: "A8",
-    title: "A8",
-  },
-  {
-    code: "A9",
-    title: "A9",
-  },
-  {
-    code: "A10",
-    title: "A10",
-  },
-  {
-    code: "A11",
-    title: "A11",
-  },
-  {
-    code: "A12",
-    title: "A12",
-  },
-  {
-    code: "A13",
-    title: "A13",
-  },
-  {
-    code: "A14",
-    title: "A14",
-  },
-  {
-    code: "A15",
-    title: "A15",
-  },
-  {
-    code: "A16",
-    title: "A16",
-  },
-  {
-    code: "A17",
-    title: "A17",
-  },
-]
+export const list_item: IItemTypes[] = createItems("A", 17)
+export const list_item2: IItemTypes[] = createItems("B", 9)
+export const list_item3: IItemTypes[] = createItems("C", 12)
+export const list_item4: IItemTypes[] = createItems("D", 6)
+export const list_item5: IItemTypes[] = createItems("E", 13)
+export const list_item6: IItemTypes[] = createItems("F", 8)
+
+export const checkItemTypes = (type: string): IItemTypes[] => {
+  let res: IItemTypes[] = []
+  let temp = type.replace(/[0-9]/g, '');
+  switch (temp) {
+    case "A":
+      res = list_item
+      break
+    case "B":
+      res = list_item2
+      break
+    case "C":
+      res = list_item3
+      break
+    case "D":
+      res = list_item4
+      break
+    case "E":
+      res = list_item5
+      break
+    case "F":
+      res = list_item6
+      break
+
+    default:
+      res = list_bag
+      break
+  }
+  return res
+}
 
 export const COL_CHOCOLATE = "#de6800"
 export const COL_BRIGHT_CHOCOLATE = "#f5ae70"
@@ -126,8 +87,16 @@ export interface IQuest {
 export interface IInitialProps {
   data: Box[]
   quests: IQuest[]
+  playerData: IPlayerInformation
+  log: string[]
 }
 
+export interface IPlayerInformation {
+  score: number
+  mergeCount: number
+  isGameOver: boolean
+  gameOverText: string
+}
 export interface IReplaceProps {
   indexFr: number
   indexTo: number

@@ -1,9 +1,10 @@
 import { FC } from "react"
 import BAG from "../assets/Bag.png"
-import A1 from "../assets/A1.png"
-import A2 from "../assets/A2.png"
-import A3 from "../assets/A3.png"
-import A4 from "../assets/A4.png"
+import A1 from "../assets/pixel/A1.png"
+import A2 from "../assets/pixel/A2.png"
+import A3 from "../assets/pixel/A3.png"
+import A4 from "../assets/pixel/A4.png"
+import A5 from "../assets/pixel/A5.png"
 import B1 from "../assets/B1.png"
 import B2 from "../assets/B2.png"
 import B3 from "../assets/B3.png"
@@ -20,7 +21,11 @@ interface IProps {
   src: string | undefined | null
 }
 export const ItemImageDisplayer: FC<IProps> = ({ src }) => {
-  return src === null ? <></> : <img src={src} className="h-10" />
+  return src === null ? (
+    <></>
+  ) : (
+    <img src={src} className="h-10" style={{ imageRendering: "pixelated" }} />
+  )
 }
 
 export const calculateImageId = (id: string | null | undefined) => {
@@ -43,6 +48,9 @@ export const calculateImageId = (id: string | null | undefined) => {
       break
     case "A4":
       result = A4
+      break
+    case "A5":
+      result = A5
       break
     case "B1":
       result = B1

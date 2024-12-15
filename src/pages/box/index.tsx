@@ -81,7 +81,7 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
     drop(el)
   }
   return (
-    <div className={"bg-emerald-600 cursor-grab"}>
+    <div className={"bg-emerald-600 cursor-grab h-[50px]"}>
       <div
         id={boxId}
         className={`${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}
@@ -105,7 +105,12 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
           <div
             onClick={() => {
               if (data[index].charges) {
-                dispatch(addData({ parentIndex: index }))
+                dispatch(
+                  addData({
+                    parentIndex: index,
+                    bagType: data[index].itemTypes?.code ?? "",
+                  }),
+                )
               }
             }}
             ref={attachRef}
@@ -115,6 +120,7 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
             {type ?? ""}
           </div>
         </motion.div>
+        {/* <span className="text-sm font-thin">{"\n" + index}</span> */}
       </div>
     </div>
   )

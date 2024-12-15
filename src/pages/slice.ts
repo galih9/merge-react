@@ -3,11 +3,19 @@ import {
   Box,
   ICompleteQuestProps,
   IInitialProps,
-  IItemTypes,
   IReplaceProps,
   list_bag,
   list_item,
+  // list_item2,
+  // list_item3,
 } from "./types"
+import {
+  checkAvailableSlot,
+  calculateBagType,
+  calculateNextTier,
+  getEmptySlots,
+  checkIsGameOver,
+} from "./functions"
 
 const populateData = (): Box[] => {
   var result: Box[] = Array.from(new Array(45)).map((_, index) => ({
@@ -17,6 +25,7 @@ const populateData = (): Box[] => {
     charges: undefined,
     itemTypes: undefined,
     condition: "locked",
+    // locked // normal
   }))
 
   const { outerEdge, innerEdge } = getGridEdges(result, 5, 9) // 5 rows, 9 columns
@@ -130,47 +139,13 @@ const initialState: IInitialProps = {
       reward: list_item[7],
     },
   ],
-}
-
-export const checkAvailableSlot = (state: Box[]): number | null => {
-  for (let i = 0; i < state.length; i++) {
-    const element = state[i]
-    if (!element.isFilled) {
-      return i
-    }
-  }
-  return null
-}
-
-const calculateNextTier = (val: string | undefined): IItemTypes | undefined => {
-  if (val) {
-    if (val.includes("BAG")) {
-      for (let i = 0; i < list_bag.length; i++) {
-        const element = list_bag[i]
-        if (val === element.code && i != list_bag.length) {
-          return list_bag[i + 1]
-        }
-      }
-    }
-    for (let i = 0; i < list_item.length; i++) {
-      const element = list_item[i]
-      if (val === element.code && i != list_item.length) {
-        return list_item[i + 1]
-      }
-    }
-  }
-  return undefined
-}
-
-export const getSpecificItemCount = (data: Box[], code: string): number => {
-  let count = 0
-  for (let i = 0; i < data.length; i++) {
-    const element = data[i]
-    if (element.itemTypes?.code === code && element.condition === "normal") {
-      count += 1
-    }
-  }
-  return count
+  playerData: {
+    score: 0,
+    mergeCount: 0,
+    isGameOver: false,
+    gameOverText: "",
+  },
+  log: [],
 }
 
 const gameSlice = createSlice({
@@ -180,7 +155,10 @@ const gameSlice = createSlice({
     setData: (state, { payload }) => {
       state.data = payload
     },
-    addData: (state, action: PayloadAction<{ parentIndex: number }>) => {
+    addData: (
+      state,
+      action: PayloadAction<{ parentIndex: number; bagType: string }>,
+    ) => {
       const idx = checkAvailableSlot(state.data)
       const pdx = action.payload.parentIndex
       const charges = state.data[pdx].charges
@@ -192,15 +170,11 @@ const gameSlice = createSlice({
           }
           state.data[pdx].charges! -= 1
         }
-        const newdata: Box = {
-          isFilled: true,
-          name: `${idx + 1}`,
-          index: idx,
-          itemTypes: list_item[0],
-          condition: "normal",
-        }
+        const newdata: Box = calculateBagType(action.payload.bagType, idx)
         state.data[idx] = newdata
       }
+      // log
+      state.log.push("added item!")
     },
     mergeData: (state, action: PayloadAction<IReplaceProps>) => {
       let table = state.data
@@ -212,6 +186,8 @@ const gameSlice = createSlice({
       if (fr.itemTypes?.code != to.itemTypes?.code || next_tier === undefined) {
         table[tdx] = fr
         table[fdx] = to
+        // log
+        state.log.push("item swapped!")
       } else {
         table[tdx] = {
           ...to,
@@ -224,8 +200,29 @@ const gameSlice = createSlice({
           isFilled: false,
           itemTypes: undefined,
         }
-      }
+        let point = next_tier.code.replace(/\D/g, "")
+        state.playerData.score += parseInt(point)
+        state.playerData.mergeCount += 1
+        // =========================== to be fixed
+        if (
+          state.playerData.mergeCount != 0 &&
+          state.playerData.mergeCount % 5 === 0
+        ) {
+          let check = getEmptySlots(state.data)
+          state.log.push(`${JSON.stringify(check)}`)
+          state.log.push(`index from ${fdx}`)
+          state.log.push(`index to ${tdx}`)
+        }
+        // =============================================
 
+        // log
+        state.log.push("item merged!")
+      }
+      if (checkIsGameOver(state.data)) {
+        state.playerData.gameOverText =
+          "You can't do any merging or spawning any item,\n maybe try to get as much box next time"
+      }
+      state.playerData.isGameOver = checkIsGameOver(state.data)
       state.data = table
     },
     replaceData: (state, action: PayloadAction<IReplaceProps>) => {
@@ -233,6 +230,8 @@ const gameSlice = createSlice({
       const to = state.data[action.payload.indexTo]
       state.data[action.payload.indexTo] = fr
       state.data[action.payload.indexFr] = to
+      // log
+      state.log.push("item replaced!")
     },
     completeQuest: (state, action: PayloadAction<ICompleteQuestProps>) => {
       const targetIdx = checkAvailableSlot(state.data)
@@ -263,11 +262,19 @@ const gameSlice = createSlice({
           condition: "normal",
         }
         state.data[targetIdx] = newdata
+
+        // log
+        state.log.push("quest completed!")
       }
     },
+    retryGame: (state) => {
+      state.data = initialState.data;
+      state.log = initialState.log;
+      state.playerData = initialState.playerData;
+    }
   },
 })
 
-export const { setData, replaceData, addData, mergeData, completeQuest } =
+export const { setData, replaceData, addData, mergeData, completeQuest, retryGame } =
   gameSlice.actions
 export default gameSlice
