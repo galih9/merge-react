@@ -111,7 +111,6 @@ export const checkIsGameOver = (data: Box[]): boolean => {
   }
   // 1 check bags /// to be fixed
   for (let k = 0; k < list_bag.length; k++) {
-    console.log(unlocked.includes(list_bag[k].code))
     if (!unlocked.includes(list_bag[k].code)) {
       isgo = true
     }
@@ -119,7 +118,6 @@ export const checkIsGameOver = (data: Box[]): boolean => {
   }
   // 2 check locked item
   if (isgo) {
-    console.log(isgo)
     isgo = areArraysDisjoint(unlocked, locked)
   }
   // 3 check unlocked item

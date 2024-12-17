@@ -26,14 +26,6 @@ export const Box: FC<BoxProps> = ({ name, index, type, boxId, isFilled }) => {
       end: (item, monitor) => {
         const dropResult = monitor.getDropResult<BoxProps>()
         if (item && dropResult) {
-          // const toItem = data[dropResult.index]
-          // console.log(
-          //   "result",
-          //   dropResult.index,
-          //   "/compare/",
-          //   toItem.index,
-          //   index,
-          // )
           if (index != dropResult.index) {
             if (type === dropResult.type) {
               dispatch(

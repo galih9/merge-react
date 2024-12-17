@@ -1,7 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import {
   Box,
+  complimentText,
+  doneQuestText,
+  gameOverText,
   ICompleteQuestProps,
+  idleText,
   IInitialProps,
   IReplaceProps,
   list_bag,
@@ -16,6 +20,7 @@ import {
   getEmptySlots,
   checkIsGameOver,
 } from "./functions"
+import { generateRandomNumber } from "../utils/coordinates"
 
 const populateData = (): Box[] => {
   var result: Box[] = Array.from(new Array(45)).map((_, index) => ({
@@ -146,6 +151,10 @@ const initialState: IInitialProps = {
     gameOverText: "",
   },
   log: [],
+  currentStatus: "init",
+  npcData: {
+    showedText: "Hello my name is dash, i will be your guide",
+  },
 }
 
 const gameSlice = createSlice({
@@ -217,10 +226,16 @@ const gameSlice = createSlice({
 
         // log
         state.log.push("item merged!")
+        state.currentStatus = "done_merge"
+        state.npcData.showedText =
+          complimentText[generateRandomNumber(complimentText.length - 1, 0)]
       }
       if (checkIsGameOver(state.data)) {
         state.playerData.gameOverText =
-          "You can't do any merging or spawning any item,\n maybe try to get as much box next time"
+          "You can't do any merging or spawning any item, there is nothing more you can do!"
+        state.currentStatus = "done_merge"
+        state.npcData.showedText =
+          gameOverText[generateRandomNumber(gameOverText.length - 1, 0)]
       }
       state.playerData.isGameOver = checkIsGameOver(state.data)
       state.data = table
@@ -263,18 +278,37 @@ const gameSlice = createSlice({
         }
         state.data[targetIdx] = newdata
 
+        state.currentStatus = "done_quest"
+        state.npcData.showedText =
+          doneQuestText[generateRandomNumber(doneQuestText.length - 1, 0)]
         // log
         state.log.push("quest completed!")
       }
     },
-    retryGame: (state) => {
-      state.data = initialState.data;
-      state.log = initialState.log;
-      state.playerData = initialState.playerData;
-    }
+    retryGame: state => {
+      state.data = initialState.data
+      state.log = initialState.log
+      state.playerData = initialState.playerData
+      state.npcData.showedText =
+        idleText[generateRandomNumber(idleText.length - 1, 0)]
+    },
+    setStatusGame: (state, action) => {
+      state.currentStatus = action.payload
+    },
+    setShowedNpcText: (state, action) => {
+      state.npcData.showedText = action.payload
+    },
   },
 })
 
-export const { setData, replaceData, addData, mergeData, completeQuest, retryGame } =
-  gameSlice.actions
+export const {
+  setData,
+  replaceData,
+  addData,
+  mergeData,
+  completeQuest,
+  retryGame,
+  setStatusGame,
+  setShowedNpcText,
+} = gameSlice.actions
 export default gameSlice

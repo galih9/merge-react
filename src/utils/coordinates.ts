@@ -29,6 +29,12 @@ export const calculateRandomNumber = (
   return result
 }
 
+export const generateRandomNumber = (maxV?: number, minV?: number): number => {
+  const max = maxV ?? 10
+  const min = minV ?? 0
+  return Math.round(Math.random() * (max - min) + min)
+}
+
 export function removeItemFromArray<T>(array: T[], itemToRemove: T): T[] {
-  return array.filter((item) => item !== itemToRemove);
+  return array.filter(item => item !== itemToRemove)
 }

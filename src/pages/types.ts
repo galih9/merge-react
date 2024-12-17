@@ -31,7 +31,7 @@ export const list_item6: IItemTypes[] = createItems("F", 8)
 
 export const checkItemTypes = (type: string): IItemTypes[] => {
   let res: IItemTypes[] = []
-  let temp = type.replace(/[0-9]/g, '');
+  let temp = type.replace(/[0-9]/g, "")
   switch (temp) {
     case "A":
       res = list_item
@@ -89,6 +89,19 @@ export interface IInitialProps {
   quests: IQuest[]
   playerData: IPlayerInformation
   log: string[]
+  // npc: INpcDialogues
+  npcData: INpcData
+  currentStatus: "init" | "game_over" | "idle" | "done_merge" | "done_quest"
+}
+
+export interface INpcData {
+  showedText: string
+}
+export interface INpcDialogues {
+  gameOverText: string[]
+  idleText: string[]
+  complimentText: string[]
+  doneQuestText: string[]
 }
 
 export interface IPlayerInformation {
@@ -101,3 +114,26 @@ export interface IReplaceProps {
   indexFr: number
   indexTo: number
 }
+export const doneQuestText = [
+  "nice one",
+  "ah you notice the quest, finally",
+  "hmm, nice",
+  "Im counting on you",
+]
+export const gameOverText = [
+  "maybe complete the side quest next time",
+  "try to get as many bag available",
+  "I think you are not built for this game",
+]
+export const idleText = [
+  "don't get rushed",
+  "take it slow, but not too slow",
+  "thinking... are you?",
+  "hellooo?? are you sleeping?",
+]
+export const complimentText = [
+  "nice move",
+  "I would do that too",
+  "damn, that unpredictable",
+  "wow",
+]
